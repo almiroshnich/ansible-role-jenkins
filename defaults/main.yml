@@ -16,16 +16,15 @@ jenkins_jar_location: /opt/jenkins-cli.jar
 jenkins_url_prefix: ""
 jenkins_java_options: "-Djenkins.install.runSetupWizard=false"
 
-jenkins_plugins: []
-jenkins_plugins_state: present
 jenkins_plugin_updates_expiration: 86400
 jenkins_plugin_timeout: 30
+jenkins_plugin_collection: {}
+#  <name>:
+#    version: "<value>"
+#    state: "<value>"  # present | absent
 
 jenkins_admin_username: admin
 jenkins_admin_password: admin
-jenkins_admin_password_file: ""
-jenkins_admin_token: ""
-jenkins_admin_token_file: ""
 
 jenkins_process_user: jenkins
 jenkins_process_group: "{{ jenkins_process_user }}"
