@@ -14,7 +14,6 @@ jenkins_hostname: localhost
 jenkins_http_port: 8080
 jenkins_jar_location: /opt/jenkins-cli.jar
 jenkins_url_prefix: ""
-jenkins_java_options: "-Djenkins.install.runSetupWizard=false"
 
 jenkins_plugin_updates_expiration: 86400
 jenkins_plugin_timeout: 30
@@ -29,8 +28,65 @@ jenkins_admin_password: admin
 jenkins_process_user: jenkins
 jenkins_process_group: "{{ jenkins_process_user }}"
 
+# Default to all interfaces
+jenkins_listen_address: "0.0.0.0"
+# Default to any suitable Java ont he system
+jenkins_java_cmd: ""
+# NOTE: do not change formatting for 'jenkins_java_options' & 'jenkins_jar_args',
+#   it's way too sensitive!
+jenkins_java_heap_initial: "2048m"
+jenkins_java_heap_max: "2048m"
+jenkins_java_options: "-Xmx{{ jenkins_java_heap_max }}
+  -Xms{{ jenkins_java_heap_initial }}
+  -server
+  -XX:+AlwaysPreTouch
+  -XX:+UseG1GC
+  -XX:+HeapDumpOnOutOfMemoryError
+  -XX:+ExplicitGCInvokesConcurrent
+  -XX:+ParallelRefProcEnabled
+  -XX:+UseStringDeduplication
+  -XX:+UnlockExperimentalVMOptions
+  -XX:+UnlockDiagnosticVMOptions
+  -XX:G1NewSizePercent=20
+  -XX:G1SummarizeRSetStatsPeriod=1
+  -Djava.awt.headless=true
+  -Dcom.sun.management.jmxremote.port=7982
+  -Dcom.sun.management.jmxremote.ssl=false
+  -Dcom.sun.management.jmxremote.authenticate=false
+  -Xloggc:/var/log/jenkins/gc.log
+  -XX:-UseGCLogFileRotation
+  -XX:NumberOfGCLogFiles=5
+  -XX:GCLogFileSize=20m
+  -XX:+PrintGC
+  -XX:+PrintGCDateStamps
+  -XX:+PrintGCDetails
+  -XX:+PrintHeapAtGC
+  -XX:+PrintGCCause
+  -XX:+PrintTenuringDistribution
+  -XX:+PrintReferenceGC
+  -XX:+PrintAdaptiveSizePolicy
+  -Dhudson.DNSMultiCast.disabled=true
+  -Dhudson.remoting.RemoteInvocationHandler.Unexporter.retainOrigin=false
+  -Djenkins.install.runSetupWizard=false
+  -Duser.language=en
+  -Duser.region=US"
+
+jenkins_args: "-Dhudson.diyChunking=false
+  --accessLoggerClassName=winstone.accesslog.SimpleAccessLogger
+  --simpleAccessLogger.format=combined
+  --simpleAccessLogger.file=/var/log/jenkins/access.log
+  --prefix={{ jenkins_url_prefix }}"
+
 jenkins_init_changes:
   - option: "JENKINS_ARGS"
-    value: "--prefix={{ jenkins_url_prefix }}"
+    value: "{{ jenkins_args }}"
   - option: "{{ jenkins_java_options_env_var }}"
     value: "{{ jenkins_java_options }}"
+  - option: "JENKINS_JAVA_CMD"
+    value: "{{ jenkins_java_cmd }}"
+  - option: "JENKINS_HOME"
+    value: "{{ jenkins_home }}"
+  - option: "JENKINS_LISTEN_ADDRESS"
+    value: "{{ jenkins_listen_address }}"
+  - option: "{{ jenkins_http_port_param }}"
+    value: "{{ jenkins_http_port }}"

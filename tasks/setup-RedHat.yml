@@ -40,3 +40,27 @@
   package:
     name: jenkins
     state: "{{ jenkins_package_state }}"
+
+- name: Remove installer package afterwards
+  file:
+    path: "/tmp/jenkins-{{ jenkins_version }}-1.1.noarch.rpm"
+    state: absent
+  ignore_errors: yes
+
+# Custom
+# TODO: propage to the Debian setup as well
+- name: Disable SElinux permanetly
+  selinux: state=disabled
+
+- name: Install EPEL needed package management
+  yum: name=epel-release state=present update_cache=yes
+
+- name: Install System Base Packages
+  yum: name={{ item }} state=present
+  with_items:
+    - unzip
+    - ntp
+    - git
+    - nano
+    - python-pip
+    - python-devel

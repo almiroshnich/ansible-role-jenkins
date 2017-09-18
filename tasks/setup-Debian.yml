@@ -40,3 +40,9 @@
   apt:
     name: jenkins
     state: "{{ jenkins_package_state }}"
+
+- name: Remove installer package afterwards
+  file:
+    path: "/tmp/jenkins_{{ jenkins_version }}_all.deb"
+    state: absent
+  ignore_errors: yes
